@@ -1,0 +1,28 @@
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/html:/usr/share/nginx/html
+    depends_on:
+      - application
+    networks:
+      - frontend
+
+
+  application:
+    build: java/
+    container_name: application
+    ports:
+      - "8080:8080"
+    networks:
+      - frontend
+
+
+networks:
+  frontend:
+    name: frontend
+    driver: bridge

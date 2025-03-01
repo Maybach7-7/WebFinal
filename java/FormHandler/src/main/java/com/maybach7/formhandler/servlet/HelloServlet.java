@@ -1,4 +1,4 @@
-package com.maybach7.formhandler;
+package com.maybach7.formhandler.servlet;
 
 import java.io.*;
 

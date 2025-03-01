@@ -24,7 +24,7 @@ public class UserDao implements Dao<User> {
 
     @Override
     public User save(User user)  {
-        try(var connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/applications")){
+        try(var connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/web")){
             var preparedStatement = connection.prepareStatement(SAVE_SQL);
             System.out.println("Connected to a database");
             preparedStatement.setString(1, user.getFullName());
@@ -47,7 +47,7 @@ public class UserDao implements Dao<User> {
     }
 
     public boolean saveLanguage(User user, Language language) {
-        try(var connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/applications")) {
+        try(var connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/web")) {
             var preparedStatement = connection.prepareStatement(SAVE_LANGUAGE_SQL);
             preparedStatement.setInt(1, user.getId());
             preparedStatement.setInt(2, language.getId());

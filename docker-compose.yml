@@ -18,11 +18,32 @@ services:
     container_name: application
     ports:
       - "8080:8080"
+    depends_on:
+      - db
     networks:
       - frontend
+      - backend
+
+  db:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=web
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql/data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend
 
 
 networks:
   frontend:
     name: frontend
+    driver: bridge
+  backend:
+    name: backend
     driver: bridge

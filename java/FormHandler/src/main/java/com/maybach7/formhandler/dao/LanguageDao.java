@@ -20,7 +20,7 @@ public class LanguageDao {
             "SELECT * FROM languages where name = ?";
 
     public Language findByName(String name) {
-        try(var connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/applications")) {
+        try(var connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/web")) {
             var preparedStatement = connection.prepareStatement(FIND_BY_NAME, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, name);
 

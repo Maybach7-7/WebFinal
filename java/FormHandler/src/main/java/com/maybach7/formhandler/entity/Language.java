@@ -7,7 +7,6 @@ import lombok.Value;
 
 @Data
 @AllArgsConstructor
-@Builder
 public class Language {
 
     private Integer id;

@@ -3,6 +3,7 @@ package com.maybach7.formhandler.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Builder
+@ToString
 public class User {
 
     private Integer id;
@@ -17,6 +19,6 @@ public class User {
     private String email;
     private LocalDate birthday;
     private Gender gender;
-    private List<Language> languages;
+    private List<ProgrammingLanguage> languages;
     private String biography;
 }

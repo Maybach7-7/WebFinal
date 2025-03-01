@@ -4,10 +4,13 @@ import com.maybach7.formhandler.dto.ApplicationDto;
 import com.maybach7.formhandler.entity.Gender;
 import com.maybach7.formhandler.entity.ProgrammingLanguage;
 import com.maybach7.formhandler.util.LocalDateFormatter;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApplicationValidator implements Validator<ApplicationDto> {
 
     private final static ApplicationValidator INSTANCE = new ApplicationValidator();
@@ -48,5 +51,9 @@ public class ApplicationValidator implements Validator<ApplicationDto> {
         }
 
         return validationResult;
+    }
+
+    public static ApplicationValidator getInstance() {
+        return INSTANCE;
     }
 }

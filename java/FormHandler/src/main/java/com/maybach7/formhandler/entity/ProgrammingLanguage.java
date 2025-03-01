@@ -28,7 +28,7 @@ public enum ProgrammingLanguage {
         return name;
     }
 
-    public Optional<ProgrammingLanguage> find(String language) {
+    public static Optional<ProgrammingLanguage> find(String language) {
         return Arrays.stream(values())
                 .filter(el -> el.getName().equalsIgnoreCase(language))
                 .findFirst();

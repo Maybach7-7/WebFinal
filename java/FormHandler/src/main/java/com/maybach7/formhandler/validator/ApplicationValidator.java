@@ -7,9 +7,6 @@ import com.maybach7.formhandler.util.LocalDateFormatter;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApplicationValidator implements Validator<ApplicationDto> {
 
@@ -18,12 +15,12 @@ public class ApplicationValidator implements Validator<ApplicationDto> {
     @Override
     public ValidationResult validate(ApplicationDto dto) {
         var validationResult = new ValidationResult();
-        if (!dto.getFullName().matches("/(^[А-ЯЁ][а-яё]+(-[А-ЯЁ][а-яё]+)? [А-ЯЁ][а-яё]+( [А-ЯЁ][а-яё]+)?)$")) {
+        if (!dto.getFullName().matches("(^[А-ЯЁ][а-яё]+(-[А-ЯЁ][а-яё]+)? [А-ЯЁ][а-яё]+( [А-ЯЁ][а-яё]+)?)$")) {
             validationResult.add(
                     Error.of("invalid.fullname", "Fullname is invalid")
             );
         }
-        if (!dto.getEmail().matches("^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$")) {
+        if (!dto.getEmail().matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+.+.[A-Za-z]{2,4}$")) {
             validationResult.add(
                     Error.of("invalid.email", "Email is invalid")
             );
@@ -43,8 +40,8 @@ public class ApplicationValidator implements Validator<ApplicationDto> {
                     Error.of("invalid.gender", "Gender is invalid")
             );
         }
-        if (dto.getProgrammingLanguages().stream()
-                .allMatch(language -> ProgrammingLanguage.find(language).isPresent())){
+        if (!dto.getProgrammingLanguages().stream()
+                .allMatch(language -> ProgrammingLanguage.find(language).isPresent())) {
             validationResult.add(
                     Error.of("invalid.programmingLanguage", "Programming language is invalid")
             );

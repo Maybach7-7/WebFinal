@@ -17,6 +17,7 @@ public class User {
     private Integer id;
     private String fullName;
     private String email;
+    private String phone;
     private LocalDate birthday;
     private Gender gender;
     private List<ProgrammingLanguage> languages;

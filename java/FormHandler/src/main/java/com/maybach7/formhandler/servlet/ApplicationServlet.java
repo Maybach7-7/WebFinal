@@ -8,6 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -26,6 +27,7 @@ public class ApplicationServlet extends HttpServlet {
                 .programmingLanguages(Arrays.stream(req.getParameterValues("languages")).toList())
                 .biography(req.getParameter("biography"))
                 .build();
+        System.out.println(applicationDto);
         User user = ApplicationService.getInstance().createUser(applicationDto);
         System.out.println(user);
     }

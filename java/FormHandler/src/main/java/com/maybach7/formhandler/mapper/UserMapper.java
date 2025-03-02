@@ -18,8 +18,9 @@ public class UserMapper implements Mapper<User, ApplicationDto> {
         return User.builder()
                 .fullName(dto.getFullName())
                 .email(dto.getEmail())
+                .phone(dto.getPhone())
                 .birthday(LocalDate.parse(dto.getBirthday()))
-                .gender(Gender.valueOf(dto.getGender()))
+                .gender(Gender.valueOf(dto.getGender().toUpperCase()))
                 .languages(mapProgrammingLanguages(dto.getProgrammingLanguages()))
                 .biography(dto.getBiography())
                 .build();
@@ -32,7 +33,8 @@ public class UserMapper implements Mapper<User, ApplicationDto> {
                 .toList();
     }
 
-    private UserMapper() {}
+    private UserMapper() {
+    }
 
     public static UserMapper getInstance() {
         return INSTANCE;

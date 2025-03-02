@@ -1,12 +1,10 @@
 package com.maybach7.formhandler.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Value;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
+@ToString
 public class Language {
 
     private Integer id;

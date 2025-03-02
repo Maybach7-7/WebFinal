@@ -33,4 +33,13 @@ public enum ProgrammingLanguage {
                 .filter(el -> el.getName().equalsIgnoreCase(language))
                 .findFirst();
     }
+
+    public static ProgrammingLanguage get(String language) {
+        Optional<ProgrammingLanguage> result = find(language);
+        if (result.isPresent()) {
+            return result.get();
+        } else {
+            throw new IllegalArgumentException("Language " + language + " not found");
+        }
+    }
 }

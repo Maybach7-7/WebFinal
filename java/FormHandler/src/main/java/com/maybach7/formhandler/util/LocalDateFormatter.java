@@ -22,7 +22,7 @@ public class LocalDateFormatter {
             return Optional.ofNullable(date)
                     .map(LocalDateFormatter::format)
                     .isPresent();
-        } catch(DateTimeParseException exc) {
+        } catch (DateTimeParseException exc) {
             return false;
         }
     }

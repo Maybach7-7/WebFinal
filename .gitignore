@@ -1,1 +1,4 @@
-sql/data/
+sql/data/  
+java/**/target/  
+!java/**/target/  
+!java/**/target/*.war

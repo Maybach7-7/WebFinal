@@ -10,11 +10,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 
 @WebServlet("/application")
 public class ApplicationServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+        out.println("<h1>You need to post to this endpoint</h1>");
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -30,5 +38,11 @@ public class ApplicationServlet extends HttpServlet {
         System.out.println(applicationDto);
         User user = ApplicationService.getInstance().createUser(applicationDto);
         System.out.println(user);
+
+        resp.setContentType("text/html");
+        resp.setCharacterEncoding("UTF-8");
+        PrintWriter writer = resp.getWriter();
+        writer.println("<p>You've successfully submitted the application!<p>");
+        writer.println("<p>" + user.toString() + "</p>");
     }
 }

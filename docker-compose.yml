@@ -8,14 +8,15 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/html:/usr/share/nginx/html
     depends_on:
-      - application
+      - app
+      - db
     networks:
       - frontend
 
 
-  application:
+  app:
     build: java/
-    container_name: application
+    container_name: app
     ports:
       - "8080:8080"
     depends_on:

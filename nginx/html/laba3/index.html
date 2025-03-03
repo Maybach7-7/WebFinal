@@ -15,7 +15,7 @@
         <div class="popup-content">
             <h3>Форма для розыгрыша</h3><br>
 
-            <form id="form" action="http://localhost:8080/laba3" method="POST">
+            <form id="form" action="/backend/application" method="POST">
                 <table>
                     <tr>
                         <td><label for="fullname">ФИО</label></td>
@@ -40,12 +40,12 @@
 			</td>
 			<td>
 				<div>
-					<input type="radio" checked="checked" required name="sex" value="male" id="male"/>
+					<input type="radio" checked="checked" required name="gender" value="male" id="male"/>
             			<label class="form-check-label" for="male">Мужской</label>
           			</div>
 
           			<div>
-            			<input type="radio" name="sex" required value="female" id="female" />
+            			<input type="radio" name="gender" required value="female" id="female" />
             			<label for="female">Женский</label>
 				</div>
 			</td>

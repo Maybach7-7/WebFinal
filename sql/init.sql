@@ -12,6 +12,7 @@ CREATE TABLE users(
 	id serial,
 	fullname text not null,
 	email text not null,
+	phone text not null,
 	birthday date not null,
 	gender text not null,
 	biography text not null,

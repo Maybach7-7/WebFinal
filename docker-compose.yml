@@ -12,6 +12,7 @@ services:
       - db
     networks:
       - frontend
+    restart: unless-stopped
 
 
   app:
@@ -24,6 +25,7 @@ services:
     networks:
       - frontend
       - backend
+    restart: unless-stopped
 
   db:
     image: postgres:17
@@ -39,7 +41,7 @@ services:
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - backend
-
+    restart: unless-stopped
 
 networks:
   frontend:

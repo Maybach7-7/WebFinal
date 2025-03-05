@@ -43,6 +43,5 @@ public class ApplicationServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         PrintWriter writer = resp.getWriter();
         writer.println("<p>You've successfully submitted the application!<p>");
-        writer.println("<p>" + user.toString() + "</p>");
     }
 }

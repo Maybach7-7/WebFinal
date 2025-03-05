@@ -14,12 +14,11 @@ services:
       - frontend
     restart: unless-stopped
 
-
   app:
-    build: java/
+    build:
+      context: java/
+      dockerfile: Dockerfile
     container_name: app
-    ports:
-      - "8080:8080"
     depends_on:
       - db
     networks:

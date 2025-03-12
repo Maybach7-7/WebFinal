@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class ValidationException extends RuntimeException {
+public class ValidationException extends Exception {
 
     private List<Error> errors = new ArrayList<>();
 

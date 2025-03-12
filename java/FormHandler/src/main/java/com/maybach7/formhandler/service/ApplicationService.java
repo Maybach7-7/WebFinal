@@ -19,7 +19,7 @@ public class ApplicationService {
     private final UserMapper userMapper = UserMapper.getInstance();
     private final UserDao userDao = UserDao.getInstance();
 
-    public User createUser(ApplicationDto dto) {
+    public User createUser(ApplicationDto dto) throws ValidationException {
         var validationResult = applicationValidator.validate(dto);
         if (!validationResult.isValid()) {
             throw new ValidationException(validationResult.getErrors());

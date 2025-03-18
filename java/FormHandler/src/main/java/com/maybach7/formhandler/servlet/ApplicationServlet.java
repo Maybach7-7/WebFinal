@@ -4,6 +4,7 @@ import com.maybach7.formhandler.dto.ApplicationDto;
 import com.maybach7.formhandler.entity.User;
 import com.maybach7.formhandler.exception.ValidationException;
 import com.maybach7.formhandler.service.ApplicationService;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,10 +21,9 @@ import java.util.Arrays;
 public class ApplicationServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("text/html");
-        PrintWriter out = resp.getWriter();
-        out.println("<h1>You need to post to this endpoint</h1>");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        RequestDispatcher dispatcher = req.getRequestDispatcher("form.jsp");
+        dispatcher.forward(req, resp);
     }
 
     @Override

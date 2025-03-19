@@ -4,24 +4,50 @@ import com.maybach7.formhandler.dto.ApplicationDto;
 import com.maybach7.formhandler.entity.User;
 import com.maybach7.formhandler.exception.ValidationException;
 import com.maybach7.formhandler.service.ApplicationService;
+import com.maybach7.formhandler.util.CookiesUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 @WebServlet("/application")
 public class ApplicationServlet extends HttpServlet {
 
+    private static final List<String> singleFields = Arrays.asList(
+            "fullname",
+            "email",
+            "phone",
+            "birthday",
+            "gender",
+            "biography"
+    );
+
+    private static final List<String> multipleFields = Arrays.asList(
+            "languages"
+    );
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        for(var field : singleFields) {
+            CookiesUtil.getCookie(req, field).ifPresent(value -> req.setAttribute(field, value));
+        }
+
+        for(var field : multipleFields) {
+            CookiesUtil.getCookieArray(req, field).ifPresent(value -> req.setAttribute(field, String.join(",", value)));
+        }
+
         RequestDispatcher dispatcher = req.getRequestDispatcher("form.jsp");
         dispatcher.forward(req, resp);
     }
@@ -29,7 +55,7 @@ public class ApplicationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/html");
-        resp.setCharacterEncoding(StandardCharsets.UTF_8);
+        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
         var applicationDto = ApplicationDto.builder()
                 .fullName(req.getParameter("fullname"))
                 .email(req.getParameter("email"))
@@ -45,8 +71,18 @@ public class ApplicationServlet extends HttpServlet {
             User user = ApplicationService.getInstance().createUser(applicationDto);
             System.out.println(user);
 
-            PrintWriter writer = resp.getWriter();
-            writer.println("<p>You've successfully submitted the application!<p>");
+            // setting cookies after successfully submitting the form
+            int year = 60 * 60 * 24 * 365;
+            for(var field : singleFields) {
+                String value = req.getParameter(field);
+                CookiesUtil.setCookie(resp, field, value, year);
+            }
+            for(var field : multipleFields) {
+                String[] values = req.getParameterValues(field);
+                CookiesUtil.setCookieArray(resp, field, values, year);
+            }
+
+            resp.sendRedirect(req.getContextPath() + "/application");
         } catch(ValidationException exc) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             PrintWriter writer = resp.getWriter();

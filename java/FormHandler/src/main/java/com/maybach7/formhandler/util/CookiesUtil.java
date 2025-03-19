@@ -43,8 +43,7 @@ public class CookiesUtil {
     public static void setCookieArray(HttpServletResponse resp, String name, String[] values, int maxAge) {
         if (values != null && values.length > 0) {
             String value = String.join(",", values);
-            String encodedValue = URLEncoder.encode(value, StandardCharsets.UTF_8);
-            setCookie(resp, name, encodedValue, maxAge);
+            setCookie(resp, name, value, maxAge);
         }
     }
 

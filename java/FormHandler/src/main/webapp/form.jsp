@@ -45,21 +45,17 @@
                 </tr>
 
                 <tr>
+                    <td><label>Пол</label></td>
                     <td>
-                        <label>Пол</label>
-                    </td>
-                    <td>
-                        <div>
+                        <div class="radio-group">
                             <input type="radio" required name="gender" value="male" id="male"
-                                    <%= "male".equals(request.getAttribute("gender")) ? "checked" : ""%>
-                            />
-                            <label class="form-check-label" for="male"> Мужской</label>
+                                    <%= "male".equals(request.getAttribute("gender")) ? "checked" : ""%> />
+                            <label for="male">Мужской</label>
                         </div>
 
-                        <div>
+                        <div class="radio-group">
                             <input type="radio" required name="gender" value="female" id="female"
-                                    <%= "female".equals(request.getAttribute("gender")) ? "checked" : ""%>
-                            />
+                                    <%= "female".equals(request.getAttribute("gender")) ? "checked" : ""%> />
                             <label for="female">Женский</label>
                         </div>
                     </td>
@@ -91,13 +87,17 @@
                     <td><textarea id="biography" name="biography"
                                   placeholder="Я родился в Москве в 70-м на краю города"><%= request.getAttribute("biography") != null ? request.getAttribute("biography") : "" %></textarea></td>
                 </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <div class="checkbox-group">
+                            <input type="checkbox" name="checkbox" id="checkbox">
+                            <label for="checkbox">Готов стать миллионером</label>
+                        </div>
+                    </td>
+                </tr>
             </table>
 
-            <label>
-                <input type="checkbox" name="checkbox">
-                Готов стать миллионером
-            </label>
-            <br>
             <div id="button-container">
                 <button type="submit">Отправить</button>
                 <button id="close-form" type="button">Закрыть форму

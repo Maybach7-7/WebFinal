@@ -3,8 +3,8 @@ package com.maybach7.formhandler.validator;
 import lombok.Value;
 
 @Value(staticConstructor = "of")
-public class Error {
+public class InputError {
 
-    String code;
+    String id;
     String message;
 }

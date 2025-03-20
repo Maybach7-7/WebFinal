@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class ValidationResult {
+public class ValidationResult<E> {
 
-    private List<Error> errors = new ArrayList<>();
+    private final List<E> errors = new ArrayList<>();
 
-    public void add(Error error) {
+    public void add(E error) {
         errors.add(error);
     }
 

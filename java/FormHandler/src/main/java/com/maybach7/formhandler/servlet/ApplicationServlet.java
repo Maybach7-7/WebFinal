@@ -8,16 +8,13 @@ import com.maybach7.formhandler.util.CookiesUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -83,7 +80,7 @@ public class ApplicationServlet extends HttpServlet {
             }
 
             resp.sendRedirect(req.getContextPath() + "/application");
-        } catch(ValidationException exc) {
+        } catch(ValidationException exc) {      // здесь необходимо передать список ошибок в JSP и обработать там
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             PrintWriter writer = resp.getWriter();
             writer.println("<p>An error occurred during validation!<p>");

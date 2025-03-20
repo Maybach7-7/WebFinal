@@ -1,7 +1,7 @@
 package com.maybach7.formhandler.exception;
 
+import com.maybach7.formhandler.validator.InputError;
 import lombok.Getter;
-import com.maybach7.formhandler.validator.Error;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +9,9 @@ import java.util.List;
 @Getter
 public class ValidationException extends Exception {
 
-    private List<Error> errors = new ArrayList<>();
+    private List<InputError> errors = new ArrayList<>();
 
-    public ValidationException(List<Error> errors) {
+    public ValidationException(List<InputError> errors) {
         this.errors = errors;
     }
 }

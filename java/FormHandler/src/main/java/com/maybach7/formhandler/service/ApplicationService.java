@@ -21,7 +21,7 @@ public class ApplicationService {
 
     public User createUser(ApplicationDto dto) throws ValidationException {
         var validationResult = applicationValidator.validate(dto);
-        if (!validationResult.isValid()) {
+        if (!validationResult.isValid()) {  // будем добавлять ошибки в список, чтобы потом обработать в JSP
             throw new ValidationException(validationResult.getErrors());
         }
         System.out.println("Validation has been successfully passed");

@@ -1,4 +1,6 @@
 <%@ page import="java.util.Arrays" %>
+<%@ page import="com.maybach7.formhandler.validator.InputError" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,22 +21,32 @@
 
         <form id="form" action="" method="POST">
             <table>
+                <%
+                    boolean hasErrors = false;
+                    List<InputError> errors = (List<InputError>) request.getAttribute("errors");
+                    if(errors != null) {
+                        hasErrors = true;
+                    }
+                %>
                 <tr>
                     <td><label for="fullname">ФИО</label></td>
                     <td><input name="fullname" id="fullname" type="text" required
-                               value="<%= request.getAttribute("fullname") != null ? request.getAttribute("fullname") : "" %>">
+                               value="<%= request.getAttribute("fullname") != null ? request.getAttribute("fullname") : "" %>"
+                    <%= hasErrors && errors.stream().anyMatch(error -> error.getId().equals("fullname")) ? "style=\"border: 2px solid red;\"" : ""%>>
                     </td>
                 </tr>
                 <tr>
                     <td><label for="email">Email</label></td>
                     <td><input name="email" id="email" type="email" required
-                               value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : "" %>">
+                               value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : "" %>"
+                        <%= hasErrors && errors.stream().anyMatch(error -> error.getId().equals("email")) ? "style=\"border: 2px solid red;\"" : ""%>>
                     </td>
                 </tr>
                 <tr>
                     <td><label for="phone">Телефон</label></td>
                     <td><input id="phone" name="phone" type="tel" required
-                               value="<%= request.getAttribute("phone") != null ? request.getAttribute("phone") : "" %>">
+                               value="<%= request.getAttribute("phone") != null ? request.getAttribute("phone") : "" %>"
+                        <%= hasErrors && errors.stream().anyMatch(error -> error.getId().equals("phone")) ? "style=\"border: 2px solid red;\"" : ""%>>
                     </td>
                 </tr>
                 <tr>
@@ -67,7 +79,6 @@
                     </td>
                     <td>
                         <select id="languages" name="languages" multiple="multiple" required>
-
                             <%
                                 String selectedLanguagesRaw = (String) request.getAttribute("languages");
                                 String[] selectedLanguages = selectedLanguagesRaw != null ? selectedLanguagesRaw.split(",") : new String[0];

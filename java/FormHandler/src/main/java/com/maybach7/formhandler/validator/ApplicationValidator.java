@@ -17,33 +17,33 @@ public class ApplicationValidator implements Validator<ApplicationDto, InputErro
         ValidationResult<InputError> validationResult = new ValidationResult<>();
         if (!dto.getFullName().matches("(^[А-ЯЁ][а-яё]+(-[А-ЯЁ][а-яё]+)? [А-ЯЁ][а-яё]+( [А-ЯЁ][а-яё]+)?)$")) {
             validationResult.add(
-                    InputError.of("invalid.fullname", "Fullname is invalid")
+                    InputError.of("fullname", "Fullname is invalid")
             );
         }
         if (!dto.getEmail().matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+.+.[A-Za-z]{2,4}$")) {
             validationResult.add(
-                    InputError.of("invalid.email", "Email is invalid")
+                    InputError.of("email", "Email is invalid")
             );
         }
         if (!dto.getPhone().matches("^((\\+7|7|8)+([0-9]){10})$")) {
             validationResult.add(
-                    InputError.of("invalid.phone", "Phone is invalid")
+                    InputError.of("phone", "Phone is invalid")
             );
         }
         if (!LocalDateFormatter.isValid(dto.getBirthday())) {
             validationResult.add(
-                    InputError.of("invalid.birthday", "Birthday is invalid")
+                    InputError.of("birthday", "Birthday is invalid")
             );
         }
         if (Gender.find(dto.getGender()).isEmpty()) {
             validationResult.add(
-                    InputError.of("invalid.gender", "Gender is invalid")
+                    InputError.of("gender", "Gender is invalid")
             );
         }
         if (!dto.getProgrammingLanguages().stream()
                 .allMatch(language -> ProgrammingLanguage.find(language).isPresent())) {
             validationResult.add(
-                    InputError.of("invalid.programmingLanguage", "Programming language is invalid")
+                    InputError.of("programmingLanguage", "Programming language is invalid")
             );
         }
 

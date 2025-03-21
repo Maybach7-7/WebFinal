@@ -11,9 +11,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -37,20 +37,33 @@ public class ApplicationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        for(var field : singleFields) {
-            CookiesUtil.getCookie(req, field).ifPresent(value -> req.setAttribute(field, value));
-        }
-
-        for(var field : multipleFields) {
-            CookiesUtil.getCookieArray(req, field).ifPresent(value -> req.setAttribute(field, String.join(",", value)));
-        }
-
         RequestDispatcher dispatcher = req.getRequestDispatcher("form.jsp");
-        dispatcher.forward(req, resp);
+
+        HttpSession session = req.getSession();
+        if(session.getAttribute("errors") != null) {
+            req.setAttribute("errors", session.getAttribute("errors"));
+            session.removeAttribute("errors");
+            dispatcher.forward(req, resp);
+        } else {
+            // Мы перенаправляем сюда POST-запрос, предварительно записав в ответ необходимые Cookies
+            // Здесь мы читаем эти Cookies из запроса, устанавливаем в запросе аттрибуты для каждого поля,
+            // имея в них имя Cookie, и его значение.
+            // Затем этот запрос направляется в form.jsp с помощью RequestDispatcher, откуда оно будет передано
+            // обратно изначальному клиенту
+            for (var field : singleFields) {
+                CookiesUtil.getCookie(req, field).ifPresent(value -> req.setAttribute(field, value));
+            }
+
+            for (var field : multipleFields) {
+                CookiesUtil.getCookieArray(req, field).ifPresent(value -> req.setAttribute(field, String.join(",", value)));
+            }
+
+            dispatcher.forward(req, resp);
+        }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         resp.setContentType("text/html");
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
         var applicationDto = ApplicationDto.builder()
@@ -81,9 +94,15 @@ public class ApplicationServlet extends HttpServlet {
 
             resp.sendRedirect(req.getContextPath() + "/application");
         } catch(ValidationException exc) {      // здесь необходимо передать список ошибок в JSP и обработать там
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            PrintWriter writer = resp.getWriter();
-            writer.println("<p>An error occurred during validation!<p>");
+
+//            System.out.println("Произошла ошибка в валидации");
+//            req.setAttribute("errors", exc.getErrors());
+//            System.out.println("Установили errors: " + exc.getErrors());
+//            resp.sendRedirect(req.getContextPath() + "/application");
+
+            System.out.println("Произошла ошибка в валидации");
+            req.getSession().setAttribute("errors", exc.getErrors());
+            resp.sendRedirect(req.getContextPath() + "/application");
         }
     }
 }

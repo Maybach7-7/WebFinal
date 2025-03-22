@@ -43,8 +43,7 @@ public class ApplicationServlet extends HttpServlet {
         if(session.getAttribute("errors") != null) {
             req.setAttribute("errors", session.getAttribute("errors"));
             session.removeAttribute("errors");
-            dispatcher.forward(req, resp);
-        } else {
+        }
             // Мы перенаправляем сюда POST-запрос, предварительно записав в ответ необходимые Cookies
             // Здесь мы читаем эти Cookies из запроса, устанавливаем в запросе аттрибуты для каждого поля,
             // имея в них имя Cookie, и его значение.
@@ -59,7 +58,6 @@ public class ApplicationServlet extends HttpServlet {
             }
 
             dispatcher.forward(req, resp);
-        }
     }
 
     @Override
@@ -91,14 +89,17 @@ public class ApplicationServlet extends HttpServlet {
                 String[] values = req.getParameterValues(field);
                 CookiesUtil.setCookieArray(resp, field, values, year);
             }
-
             resp.sendRedirect(req.getContextPath() + "/application");
         } catch(ValidationException exc) {      // здесь необходимо передать список ошибок в JSP и обработать там
 
-//            System.out.println("Произошла ошибка в валидации");
-//            req.setAttribute("errors", exc.getErrors());
-//            System.out.println("Установили errors: " + exc.getErrors());
-//            resp.sendRedirect(req.getContextPath() + "/application");
+            for(var field : singleFields) {
+                String value = req.getParameter(field);
+                CookiesUtil.setCookie(resp, field, value);
+            }
+            for(var field : multipleFields) {
+                String[] values = req.getParameterValues(field);
+                CookiesUtil.setCookieArray(resp, field, values);
+            }
 
             System.out.println("Произошла ошибка в валидации");
             req.getSession().setAttribute("errors", exc.getErrors());

@@ -14,19 +14,30 @@ body {
     margin-top: 20px;
 }
 
-/* Убираем кнопку */
-button#open-form {
-    display: none;
-}
-
-/* Форма всегда отображается */
 .popup {
-    position: relative; /* Убираем fixed, чтобы форма шла в потоке */
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     display: block; /* Форма сразу видна */
     overflow: visible;
+}
+
+.popup-content button {
+    background-color: #007bff; /* Синий цвет */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.popup-content button:hover {
+    background-color: #0056b3; /* Темно-синий при наведении */
 }
 
 .popup .popup-content {

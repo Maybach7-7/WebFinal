@@ -26,6 +26,20 @@ public class CookiesUtil {
         }
     }
 
+    public static void setCookie(HttpServletResponse resp, String name, String value) {
+        if (value != null) {
+            String encodedValue = URLEncoder.encode(value, StandardCharsets.UTF_8);
+            Cookie cookie = new Cookie(name, encodedValue);
+            cookie.setPath("/");
+            resp.addCookie(cookie);
+        } else {
+            Cookie cookie = new Cookie(name, null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            resp.addCookie(cookie);
+        }
+    }
+
     public static Optional<String> getCookie(HttpServletRequest req, String name) {
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
@@ -44,6 +58,23 @@ public class CookiesUtil {
         if (values != null && values.length > 0) {
             String value = String.join(",", values);
             setCookie(resp, name, value, maxAge);
+        } else {
+            Cookie cookie = new Cookie(name, null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+
+        }
+    }
+
+    public static void setCookieArray(HttpServletResponse resp, String name, String[] values) {
+        if (values != null && values.length > 0) {
+            String value = String.join(",", values);
+            setCookie(resp, name, value);
+        } else {
+            Cookie cookie = new Cookie(name, null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+
         }
     }
 

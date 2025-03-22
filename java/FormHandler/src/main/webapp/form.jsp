@@ -9,12 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application</title>
     <link rel="stylesheet" type="text/css" href="http://localhost/static/form/style.css">
-    <script defer src="http://localhost/static/form/script.js"></script>
 </head>
 <body>
-<div class="container">
-    <button id="open-form">Открыть форму</button>
-</div>
 <div class="popup">
     <div class="popup-content">
         <h3>Форма для розыгрыша</h3><br>
@@ -26,6 +22,11 @@
                     List<InputError> errors = (List<InputError>) request.getAttribute("errors");
                     if(errors != null) {
                         hasErrors = true;
+                        for(var error : errors) {
+                %>
+                            <p style="color:red; padding: 10px"><%=error.getMessage()%></p>
+                <%
+                        }
                     }
                 %>
                 <tr>

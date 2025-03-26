@@ -4,6 +4,7 @@ import com.maybach7.formhandler.dto.ApplicationDto;
 import com.maybach7.formhandler.entity.User;
 import com.maybach7.formhandler.exception.ValidationException;
 import com.maybach7.formhandler.service.ApplicationService;
+import com.maybach7.formhandler.service.AuthService;
 import com.maybach7.formhandler.util.CookiesUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -40,24 +41,34 @@ public class ApplicationServlet extends HttpServlet {
         RequestDispatcher dispatcher = req.getRequestDispatcher("form.jsp");
 
         HttpSession session = req.getSession();
-        if(session.getAttribute("errors") != null) {
+        if (session.getAttribute("errors") != null) {
             req.setAttribute("errors", session.getAttribute("errors"));
             session.removeAttribute("errors");
         }
-            // Мы перенаправляем сюда POST-запрос, предварительно записав в ответ необходимые Cookies
-            // Здесь мы читаем эти Cookies из запроса, устанавливаем в запросе аттрибуты для каждого поля,
-            // имея в них имя Cookie, и его значение.
-            // Затем этот запрос направляется в form.jsp с помощью RequestDispatcher, откуда оно будет передано
-            // обратно изначальному клиенту
-            for (var field : singleFields) {
-                CookiesUtil.getCookie(req, field).ifPresent(value -> req.setAttribute(field, value));
-            }
+        if (session.getAttribute("login") != null && session.getAttribute("password") != null) {
+            System.out.println("Login in session: " + session.getAttribute("login"));
+            req.setAttribute("login", session.getAttribute("login"));
+            session.removeAttribute("login");
 
-            for (var field : multipleFields) {
-                CookiesUtil.getCookieArray(req, field).ifPresent(value -> req.setAttribute(field, String.join(",", value)));
-            }
+            req.setAttribute("password", session.getAttribute("password"));
+            session.removeAttribute("password");
+        }
+        session.invalidate();   // дальше пусть пользователь регается
 
-            dispatcher.forward(req, resp);
+        // Мы перенаправляем сюда POST-запрос, предварительно записав в ответ необходимые Cookies
+        // Здесь мы читаем эти Cookies из запроса, устанавливаем в запросе аттрибуты для каждого поля,
+        // имея в них имя Cookie, и его значение.
+        // Затем этот запрос направляется в form.jsp с помощью RequestDispatcher, откуда оно будет передано
+        // обратно изначальному клиенту
+        for (var field : singleFields) {
+            CookiesUtil.getCookie(req, field).ifPresent(value -> req.setAttribute(field, value));
+        }
+
+        for (var field : multipleFields) {
+            CookiesUtil.getCookieArray(req, field).ifPresent(value -> req.setAttribute(field, String.join(",", value)));
+        }
+
+        dispatcher.forward(req, resp);
     }
 
     @Override
@@ -73,30 +84,32 @@ public class ApplicationServlet extends HttpServlet {
                 .programmingLanguages(Arrays.stream(req.getParameterValues("languages")).toList())
                 .biography(req.getParameter("biography"))
                 .build();
-        try
-        {
+        try {
             System.out.println(applicationDto);
             User user = ApplicationService.getInstance().createUser(applicationDto);
             System.out.println(user);
 
-            // setting cookies after successfully submitting the form
+            // Установка Cookies для автозаполнения формы
             int year = 60 * 60 * 24 * 365;
-            for(var field : singleFields) {
+            for (var field : singleFields) {
                 String value = req.getParameter(field);
                 CookiesUtil.setCookie(resp, field, value, year);
             }
-            for(var field : multipleFields) {
+            for (var field : multipleFields) {
                 String[] values = req.getParameterValues(field);
                 CookiesUtil.setCookieArray(resp, field, values, year);
             }
-            resp.sendRedirect(req.getContextPath() + "/application");
-        } catch(ValidationException exc) {      // здесь необходимо передать список ошибок в JSP и обработать там
 
-            for(var field : singleFields) {
+            req.getSession().setAttribute("login", AuthService.createLogin());
+            req.getSession().setAttribute("password", AuthService.createPassword());
+            resp.sendRedirect(req.getContextPath() + "/application");
+        } catch (ValidationException exc) {      // здесь необходимо передать список ошибок в JSP и обработать там
+
+            for (var field : singleFields) {
                 String value = req.getParameter(field);
                 CookiesUtil.setCookie(resp, field, value);
             }
-            for(var field : multipleFields) {
+            for (var field : multipleFields) {
                 String[] values = req.getParameterValues(field);
                 CookiesUtil.setCookieArray(resp, field, values);
             }

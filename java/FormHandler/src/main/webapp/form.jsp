@@ -118,6 +118,13 @@
             </div>
             <div id="result"></div>
         </form>
+        <% if(request.getAttribute("login") != null) {%>
+            <p>Ваш логин: ${login}</p>
+        <%}%>
+
+        <% if(request.getAttribute("password") != null) {%>
+            <p>Ваш логин: ${password}</p>
+        <%}%>
     </div>
 </div>
 </body>

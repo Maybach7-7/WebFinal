@@ -1,0 +1,20 @@
+[
+  {
+    "id": "TASK_2",
+    "priority": "HIGH",
+    "tags": [
+      "db"
+    ],
+    "description": "Create sessions and users tables in init.sql",
+    "status": "DONE"
+  },
+  {
+    "id": "TASK_3",
+    "priority": "HIGH",
+    "tags": [
+      "dao"
+    ],
+    "description": "Write DAO classes for sessions and users",
+    "status": "IN_PROGRESS"
+  }
+]

@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserDao implements Dao<User> {
+public class UserDao {
 
     private final static UserDao INSTANCE = new UserDao();
 
@@ -22,7 +22,6 @@ public class UserDao implements Dao<User> {
     private final static String SAVE_LANGUAGE_SQL =
             "INSERT INTO users_languages(user_id, language_id) VALUES(?, ?)";
 
-    @Override
     public User save(User user) {
         try (var connection = ConnectionManager.get();
              var preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {

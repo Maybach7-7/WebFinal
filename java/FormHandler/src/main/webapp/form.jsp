@@ -11,121 +11,124 @@
     <link rel="stylesheet" type="text/css" href="http://localhost/static/form/style.css">
 </head>
 <body>
-<div class="popup">
-    <div class="popup-content">
-        <h3>Форма для розыгрыша</h3><br>
 
-        <form id="form" action="" method="POST">
-            <table>
-                <%
-                    boolean hasErrors = false;
-                    List<InputError> errors = (List<InputError>) request.getAttribute("errors");
-                    if(errors != null) {
-                        hasErrors = true;
-                        for(var error : errors) {
-                %>
-                            <p style="color:red; padding: 10px"><%=error.getMessage()%></p>
-                <%
-                        }
+<header class="header">
+    <a href="/login"><button class="login-button">Войти</button></a>
+</header>
+
+<div class="popup-content">
+    <h3>Форма для розыгрыша</h3><br>
+
+    <form id="form" action="" method="POST">
+        <table>
+            <%
+                boolean hasErrors = false;
+                List<InputError> errors = (List<InputError>) request.getAttribute("errors");
+                if (errors != null) {
+                    hasErrors = true;
+                    for (var error : errors) {
+            %>
+            <p style="color:red; padding: 10px"><%=error.getMessage()%>
+            </p>
+            <%
                     }
-                %>
-                <tr>
-                    <td><label for="fullname">ФИО</label></td>
-                    <td><input name="fullname" id="fullname" type="text" required
-                               value="<%= request.getAttribute("fullname") != null ? request.getAttribute("fullname") : "" %>"
+                }
+            %>
+            <tr>
+                <td><label for="fullname">ФИО</label></td>
+                <td><input name="fullname" id="fullname" type="text" required
+                           value="<%= request.getAttribute("fullname") != null ? request.getAttribute("fullname") : "" %>"
                     <%= hasErrors && errors.stream().anyMatch(error -> error.getId().equals("fullname")) ? "style=\"border: 2px solid red;\"" : ""%>>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="email">Email</label></td>
-                    <td><input name="email" id="email" type="email" required
-                               value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : "" %>"
-                        <%= hasErrors && errors.stream().anyMatch(error -> error.getId().equals("email")) ? "style=\"border: 2px solid red;\"" : ""%>>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="phone">Телефон</label></td>
-                    <td><input id="phone" name="phone" type="tel" required
-                               value="<%= request.getAttribute("phone") != null ? request.getAttribute("phone") : "" %>"
-                        <%= hasErrors && errors.stream().anyMatch(error -> error.getId().equals("phone")) ? "style=\"border: 2px solid red;\"" : ""%>>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="birthday">Дата рождения</label></td>
-                    <td><input id="birthday" name="birthday" type="date" required
-                               value="<%= request.getAttribute("birthday") != null ? request.getAttribute("birthday") : "" %>">
-                    </td>
-                </tr>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="email">Email</label></td>
+                <td><input name="email" id="email" type="email" required
+                           value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : "" %>"
+                    <%= hasErrors && errors.stream().anyMatch(error -> error.getId().equals("email")) ? "style=\"border: 2px solid red;\"" : ""%>>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="phone">Телефон</label></td>
+                <td><input id="phone" name="phone" type="tel" required
+                           value="<%= request.getAttribute("phone") != null ? request.getAttribute("phone") : "" %>"
+                    <%= hasErrors && errors.stream().anyMatch(error -> error.getId().equals("phone")) ? "style=\"border: 2px solid red;\"" : ""%>>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="birthday">Дата рождения</label></td>
+                <td><input id="birthday" name="birthday" type="date" required
+                           value="<%= request.getAttribute("birthday") != null ? request.getAttribute("birthday") : "" %>">
+                </td>
+            </tr>
 
-                <tr>
-                    <td><label>Пол</label></td>
-                    <td>
-                        <div class="radio-group">
-                            <input type="radio" required name="gender" value="male" id="male"
-                                    <%= "male".equals(request.getAttribute("gender")) ? "checked" : ""%> />
-                            <label for="male">Мужской</label>
-                        </div>
+            <tr>
+                <td><label>Пол</label></td>
+                <td>
+                    <div class="radio-group">
+                        <input type="radio" required name="gender" value="male" id="male"
+                                <%= "male".equals(request.getAttribute("gender")) ? "checked" : ""%> />
+                        <label for="male">Мужской</label>
+                    </div>
 
-                        <div class="radio-group">
-                            <input type="radio" required name="gender" value="female" id="female"
-                                    <%= "female".equals(request.getAttribute("gender")) ? "checked" : ""%> />
-                            <label for="female">Женский</label>
-                        </div>
-                    </td>
-                </tr>
+                    <div class="radio-group">
+                        <input type="radio" required name="gender" value="female" id="female"
+                                <%= "female".equals(request.getAttribute("gender")) ? "checked" : ""%> />
+                        <label for="female">Женский</label>
+                    </div>
+                </td>
+            </tr>
 
-                <tr>
-                    <td>
-                        <label for="languages">Укажите любимые языки:</label>
-                    </td>
-                    <td>
-                        <select id="languages" name="languages" multiple="multiple" required>
-                            <%
-                                String selectedLanguagesRaw = (String) request.getAttribute("languages");
-                                String[] selectedLanguages = selectedLanguagesRaw != null ? selectedLanguagesRaw.split(",") : new String[0];
-                                String[] allLanguages = {"Pascal", "C", "C++", "JavaScript", "PHP", "Python", "Java", "Haskel", "Clojure", "Prolog", "Scala"};
-                                for (String lang : allLanguages) {
-                                    boolean isSelected = Arrays.asList(selectedLanguages).contains(lang);
-                            %>
-                            <option value="<%= lang %>" <%= isSelected ? "selected" : "" %>><%= lang %> </option>
-                            <%
-                                }
-                            %>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="biography">Биография</label></td>
-                    <td><textarea id="biography" name="biography"
-                                  placeholder="Я родился в Москве в 70-м на краю города"><%= request.getAttribute("biography") != null ? request.getAttribute("biography") : "" %></textarea></td>
-                </tr>
+            <tr>
+                <td>
+                    <label for="languages">Укажите любимые языки:</label>
+                </td>
+                <td>
+                    <select id="languages" name="languages" multiple="multiple" required>
+                        <%
+                            String selectedLanguagesRaw = (String) request.getAttribute("languages");
+                            String[] selectedLanguages = selectedLanguagesRaw != null ? selectedLanguagesRaw.split(",") : new String[0];
+                            String[] allLanguages = {"Pascal", "C", "C++", "JavaScript", "PHP", "Python", "Java", "Haskel", "Clojure", "Prolog", "Scala"};
+                            for (String lang : allLanguages) {
+                                boolean isSelected = Arrays.asList(selectedLanguages).contains(lang);
+                        %>
+                        <option value="<%= lang %>" <%= isSelected ? "selected" : "" %>><%= lang %>
+                        </option>
+                        <%
+                            }
+                        %>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="biography">Биография</label></td>
+                <td><textarea id="biography" name="biography"
+                              placeholder="Я родился в Москве в 70-м на краю города"><%= request.getAttribute("biography") != null ? request.getAttribute("biography") : "" %></textarea>
+                </td>
+            </tr>
 
-                <tr>
-                    <td colspan="2">
-                        <div class="checkbox-group">
-                            <input type="checkbox" name="checkbox" id="checkbox">
-                            <label for="checkbox">Готов стать миллионером</label>
-                        </div>
-                    </td>
-                </tr>
-            </table>
+            <tr>
+                <td colspan="2">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="checkbox" id="checkbox">
+                        <label for="checkbox">Готов стать миллионером</label>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
-            <div id="button-container">
-                <button type="submit">Отправить</button>
-                <button id="close-form" type="button">Закрыть форму
-                    (не хочу быть богатым)
-                </button>
-            </div>
-            <div id="result"></div>
-        </form>
-        <% if(request.getAttribute("login") != null) {%>
-            <p>Ваш логин: ${login}</p>
-        <%}%>
+        <div id="button-container">
+            <button type="submit">Отправить</button>
+        </div>
+        <div id="result"></div>
+    </form>
+    <% if (request.getAttribute("login") != null) {%>
+    <p>Ваш логин: ${login}</p>
+    <%}%>
 
-        <% if(request.getAttribute("password") != null) {%>
-            <p>Ваш логин: ${password}</p>
-        <%}%>
-    </div>
+    <% if (request.getAttribute("password") != null) {%>
+    <p>Ваш логин: ${password}</p>
+    <%}%>
 </div>
 </body>
 </html>

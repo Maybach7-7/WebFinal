@@ -1,3 +1,4 @@
 sql/data/  
 java/**/target/
 java/**/.idea
+java/**/.todo

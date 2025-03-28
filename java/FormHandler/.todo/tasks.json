@@ -16,5 +16,14 @@
     ],
     "description": "Write DAO classes for sessions and users",
     "status": "IN_PROGRESS"
+  },
+  {
+    "id": "TASK_4",
+    "priority": "HIGH",
+    "tags": [
+      "backend"
+    ],
+    "description": "Implement authorization mechanism in /session endpoint",
+    "status": "TODO"
   }
 ]

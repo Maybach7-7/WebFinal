@@ -1,10 +1,13 @@
 package com.maybach7.formhandler.servlet;
 
 import com.maybach7.formhandler.dto.ApplicationDto;
+import com.maybach7.formhandler.entity.Credentials;
 import com.maybach7.formhandler.entity.User;
 import com.maybach7.formhandler.exception.ValidationException;
 import com.maybach7.formhandler.service.ApplicationService;
 import com.maybach7.formhandler.service.AuthService;
+import com.maybach7.formhandler.service.CredentialsService;
+import com.maybach7.formhandler.service.HashingService;
 import com.maybach7.formhandler.util.CookiesUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -14,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -22,6 +26,8 @@ import java.util.List;
 
 @WebServlet("/application")
 public class ApplicationServlet extends HttpServlet {
+
+    private static final CredentialsService credentialsService = CredentialsService.getInstance();
 
     private static final List<String> singleFields = Arrays.asList(
             "fullname",
@@ -99,9 +105,21 @@ public class ApplicationServlet extends HttpServlet {
                 String[] values = req.getParameterValues(field);
                 CookiesUtil.setCookieArray(resp, field, values, year);
             }
+            String login = AuthService.createLogin();
+            String password = AuthService.createPassword();
+            byte[] salt = HashingService.getSalt();
+            byte[] hashedPassword = HashingService.getHash(password, salt);
+            Credentials credentials = Credentials.builder()
+                            .userId(user.getId())
+                            .login(login)
+                            .password(HashingService.toString(hashedPassword))
+                            .salt(HashingService.toString(salt))
+                            .build();
 
-            req.getSession().setAttribute("login", AuthService.createLogin());
-            req.getSession().setAttribute("password", AuthService.createPassword());
+            credentialsService.createCredentials(credentials);
+
+            req.getSession().setAttribute("login", login);
+            req.getSession().setAttribute("password", password);
             resp.sendRedirect(req.getContextPath() + "/application");
         } catch (ValidationException exc) {      // здесь необходимо передать список ошибок в JSP и обработать там
 

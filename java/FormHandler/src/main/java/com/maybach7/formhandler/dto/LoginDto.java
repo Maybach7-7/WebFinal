@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class CredentialsDto {
+public class LoginDto {
 
     String login;
     String password;

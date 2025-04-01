@@ -1,8 +1,6 @@
 \c postgres;
 DROP DATABASE IF EXISTS web;
-
 CREATE DATABASE web;
-
 \connect web
 
 CREATE SCHEMA applications;
@@ -46,6 +44,20 @@ CREATE TABLE users_languages(
 	primary key(user_id, language_id),
 	foreign key(user_id) references users(id),
 	foreign key(language_id) references languages(id)
+);
+
+CREATE TABLE users_credentials(
+	user_id integer not null references users,
+	login text not null,
+	password text not null,
+	salt text not null
+);
+
+CREATE TABLE users_sessions(
+	session_id text primary key,
+	user_id integer not null references users,
+	created_at timestamp not null default current_timestamp,
+	expires_at timestamp not null
 );
 
 ALTER DATABASE web SET search_path = applications, public;

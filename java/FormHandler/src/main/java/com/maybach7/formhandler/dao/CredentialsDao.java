@@ -2,6 +2,7 @@ package com.maybach7.formhandler.dao;
 
 import com.maybach7.formhandler.entity.Credentials;
 import com.maybach7.formhandler.exception.DaoException;
+import com.maybach7.formhandler.exception.LoginException;
 import com.maybach7.formhandler.util.ConnectionManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -35,7 +36,7 @@ public class CredentialsDao {
         }
     }
 
-    public Credentials findByLogin(String login) {
+    public Credentials findByLogin(String login) throws LoginException {
         try (var connection = ConnectionManager.get();
              var preparedStatement = connection.prepareStatement(FIND_BY_LOGIN_SQL)) {
             preparedStatement.setString(1, login);
@@ -45,7 +46,7 @@ public class CredentialsDao {
             var credentials = buildCredentials(result);
             return credentials;
         } catch (SQLException exc) {
-            throw new DaoException(exc);
+            throw new LoginException();
         }
     }
 

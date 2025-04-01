@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class ValidationException extends Exception {
+public class LoginException extends Exception {
 
     private List<InputError> errors = new ArrayList<>();
 
-    public ValidationException(List<InputError> errors) {
-        this.errors = errors;
+    public LoginException() {
+        errors.add(InputError.of("LoginOrPassword", "Логин или пароль введены неверно!"));
     }
 }

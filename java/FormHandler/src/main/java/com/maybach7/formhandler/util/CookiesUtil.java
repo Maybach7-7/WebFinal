@@ -1,8 +1,10 @@
 package com.maybach7.formhandler.util;
 
+import com.maybach7.formhandler.entity.Session;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -10,6 +12,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class CookiesUtil {
+
+    public static void setSessionCookie(HttpServletResponse resp, Session session) {
+        if(session != null) {
+            Cookie sessionId = new Cookie("session_id", session.getSessionId());
+            sessionId.setMaxAge(60*60*24*7);
+            sessionId.setPath("/");
+            resp.addCookie(sessionId);
+        } else {
+            Cookie sessionId = new Cookie("session_id", null);
+            sessionId.setMaxAge(0);
+            sessionId.setPath("/");
+            resp.addCookie(sessionId);
+        }
+    }
 
     public static void setCookie(HttpServletResponse resp, String name, String value, int maxAge) { // сохраняет одинарное значение cookie
         if (value != null) {

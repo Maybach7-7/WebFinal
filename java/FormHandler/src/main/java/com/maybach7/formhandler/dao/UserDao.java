@@ -1,6 +1,8 @@
 package com.maybach7.formhandler.dao;
 
+import com.maybach7.formhandler.entity.Gender;
 import com.maybach7.formhandler.entity.Language;
+import com.maybach7.formhandler.entity.ProgrammingLanguage;
 import com.maybach7.formhandler.entity.User;
 import com.maybach7.formhandler.exception.DaoException;
 import com.maybach7.formhandler.util.ConnectionManager;
@@ -9,6 +11,11 @@ import lombok.NoArgsConstructor;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserDao {
@@ -21,6 +28,50 @@ public class UserDao {
 
     private final static String SAVE_LANGUAGE_SQL =
             "INSERT INTO users_languages(user_id, language_id) VALUES(?, ?)";
+
+    private final static String FIND_BY_ID_SQL = """
+            SELECT u.id, u.fullname, u.email, u.phone, u.birthday, u.gender, u.biography,
+                l.name as language_name
+            FROM users u
+            LEFT JOIN users_languages ul ON u.id = ul.user_id
+            LEFT JOIN languages l ON ul.language_id = l.id
+            WHERE u.id = ? ;
+            """;
+
+    public Optional<User> findById(int id) {
+        try(var connection = ConnectionManager.get();
+            var preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
+            preparedStatement.setInt(1, id);
+
+            var resultSet = preparedStatement.executeQuery();
+
+            User user = null;
+            List<ProgrammingLanguage> languages = new ArrayList<>();
+
+            while(resultSet.next()) {
+                if(user == null) {
+                    user = User.builder()
+                            .id(resultSet.getInt("id"))
+                            .fullName(resultSet.getString("fullname"))
+                            .email(resultSet.getString("email"))
+                            .phone(resultSet.getString("phone"))
+                            .birthday(resultSet.getObject("birthday", LocalDate.class))
+                            .gender(Gender.valueOf(resultSet.getString("gender")))
+                            .biography(resultSet.getString("biography"))
+                            .languages(languages)
+                            .build();
+                }
+                String languageName = resultSet.getString("language_name");
+                if(languageName != null) {
+                    ProgrammingLanguage.find(languageName).ifPresent(languages::add);
+                }
+            }
+
+            return Optional.ofNullable(user);
+        } catch (SQLException exc) {
+            throw new DaoException(exc);
+        }
+    }
 
     public User save(User user) {
         try (var connection = ConnectionManager.get();

@@ -2,12 +2,11 @@ package com.maybach7.formhandler.servlet;
 
 import com.maybach7.formhandler.dto.ApplicationDto;
 import com.maybach7.formhandler.entity.Credentials;
+import com.maybach7.formhandler.entity.ProgrammingLanguage;
 import com.maybach7.formhandler.entity.User;
+import com.maybach7.formhandler.exception.InvalidSessionException;
 import com.maybach7.formhandler.exception.ValidationException;
-import com.maybach7.formhandler.service.ApplicationService;
-import com.maybach7.formhandler.service.AuthService;
-import com.maybach7.formhandler.service.CredentialsService;
-import com.maybach7.formhandler.service.HashingService;
+import com.maybach7.formhandler.service.*;
 import com.maybach7.formhandler.util.CookiesUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -23,7 +22,8 @@ import java.util.List;
 @WebServlet("/application")
 public class ApplicationServlet extends HttpServlet {
 
-    private static final CredentialsService credentialsService = CredentialsService.getInstance();
+    private final CredentialsService credentialsService = CredentialsService.getInstance();
+    private final SessionService sessionService = SessionService.getInstance();
 
     private static final List<String> singleFields = Arrays.asList(
             "fullname",
@@ -45,6 +45,27 @@ public class ApplicationServlet extends HttpServlet {
         String sessionId = CookiesUtil.getCookie(req, "session_id").orElse(null);
         if(sessionId != null) {
 
+            try {
+                User user = sessionService.getUserBySessionId(sessionId);
+                System.out.println("Найденный пользователь: " + user);
+                req.setAttribute("fullname", user.getFullName());
+                req.setAttribute("email", user.getEmail());
+                req.setAttribute("phone", user.getPhone());
+                req.setAttribute("birthday", user.getBirthday());
+                req.setAttribute("gender", user.getGender());
+                req.setAttribute("biography", user.getBiography());
+                var temp = user.getLanguages();
+                String[] temp2 = temp.stream()
+                                .map(ProgrammingLanguage::getName)
+                                        .toArray(String[]::new);
+                System.out.println(Arrays.toString(temp2));
+                System.out.println(String.join(",", temp2));
+                req.setAttribute("languages",  String.join(",", temp2));
+
+            } catch (InvalidSessionException exc) {
+                CookiesUtil.clearCookies(req, resp);
+                dispatcher.forward(req, resp);
+            }
         } else {
             HttpSession session = req.getSession();
             if (session.getAttribute("errors") != null) {
@@ -74,8 +95,8 @@ public class ApplicationServlet extends HttpServlet {
                 CookiesUtil.getCookieArray(req, field).ifPresent(value -> req.setAttribute(field, String.join(",", value)));
             }
         }
-        // qbjiuonfly
-        // 24*nE|E,Jg
+        // lhljlqzwxr
+        // v=)(H`F=u1
 
         dispatcher.forward(req, resp);
     }

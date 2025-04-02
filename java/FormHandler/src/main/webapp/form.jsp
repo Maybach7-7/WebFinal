@@ -2,6 +2,7 @@
 <%@ page import="com.maybach7.formhandler.validator.InputError" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.maybach7.formhandler.util.CookiesUtil" %>
+<%@ page import="com.maybach7.formhandler.entity.Gender" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -77,13 +78,13 @@
                 <td>
                     <div class="radio-group">
                         <input type="radio" required name="gender" value="male" id="male"
-                                <%= "male".equals(request.getAttribute("gender")) ? "checked" : ""%> />
+                                <%= request.getAttribute("gender")!=null && "male".equalsIgnoreCase(request.getAttribute("gender").toString()) ? "checked" : ""%> />
                         <label for="male">Мужской</label>
                     </div>
 
                     <div class="radio-group">
                         <input type="radio" required name="gender" value="female" id="female"
-                                <%= "female".equals(request.getAttribute("gender")) ? "checked" : ""%> />
+                                <%= request.getAttribute("gender")!=null && "female".equalsIgnoreCase(request.getAttribute("gender").toString()) ? "checked" : ""%> />
                         <label for="female">Женский</label>
                     </div>
                 </td>
@@ -100,9 +101,9 @@
                             String[] selectedLanguages = selectedLanguagesRaw != null ? selectedLanguagesRaw.split(",") : new String[0];
                             String[] allLanguages = {"Pascal", "C", "C++", "JavaScript", "PHP", "Python", "Java", "Haskel", "Clojure", "Prolog", "Scala"};
                             for (String lang : allLanguages) {
-                                boolean isSelected = Arrays.asList(selectedLanguages).contains(lang);
+                                boolean isSelected = Arrays.asList(selectedLanguages).contains(lang.toLowerCase());
                         %>
-                        <option value="<%= lang %>" <%= isSelected ? "selected" : "" %>><%= lang %>
+                        <option value="<%= lang.toLowerCase() %>" <%= isSelected ? "selected" : "" %>><%= lang %>
                         </option>
                         <%
                             }

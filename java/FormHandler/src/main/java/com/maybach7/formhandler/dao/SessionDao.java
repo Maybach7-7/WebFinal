@@ -2,6 +2,7 @@ package com.maybach7.formhandler.dao;
 
 import com.maybach7.formhandler.entity.Session;
 import com.maybach7.formhandler.exception.DaoException;
+import com.maybach7.formhandler.exception.InvalidSessionException;
 import com.maybach7.formhandler.util.ConnectionManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -43,7 +44,10 @@ public class SessionDao {
             var preparedStatement = connection.prepareStatement(FIND_BY_SESSION_ID_SQL)) {
             preparedStatement.setString(1, sessionId);
             var result = preparedStatement.executeQuery();
-            result.next();
+
+            if(!result.next()) {
+                return null;
+            }
             var session = buildSession(result);
 
             return session;

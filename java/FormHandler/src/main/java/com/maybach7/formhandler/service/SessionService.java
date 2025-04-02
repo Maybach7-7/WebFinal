@@ -6,6 +6,7 @@ import com.maybach7.formhandler.entity.Session;
 import com.maybach7.formhandler.entity.User;
 import com.maybach7.formhandler.exception.DaoException;
 import com.maybach7.formhandler.exception.InvalidSessionException;
+import com.maybach7.formhandler.exception.ValidationException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -19,13 +20,12 @@ public class SessionService {
     private final UserDao userDao = UserDao.getInstance();
 
     public User getUserBySessionId(String sessionId) throws InvalidSessionException {
-        try {
             Session session = sessionDao.findBySessionId(sessionId);
-            Optional<User> user= userDao.findById(session.getUserId());
+            if(session == null) {
+                throw new InvalidSessionException();
+            }
+            Optional<User> user = userDao.findById(session.getUserId());
             return user.get();
-        } catch (DaoException exc) {
-            throw new InvalidSessionException();
-        }
     }
 
     public static SessionService getInstance() {

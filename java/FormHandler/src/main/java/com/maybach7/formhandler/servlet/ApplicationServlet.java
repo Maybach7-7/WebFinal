@@ -1,8 +1,10 @@
 package com.maybach7.formhandler.servlet;
 
+import com.maybach7.formhandler.dao.SessionDao;
 import com.maybach7.formhandler.dto.ApplicationDto;
 import com.maybach7.formhandler.entity.Credentials;
 import com.maybach7.formhandler.entity.ProgrammingLanguage;
+import com.maybach7.formhandler.entity.Session;
 import com.maybach7.formhandler.entity.User;
 import com.maybach7.formhandler.exception.InvalidSessionException;
 import com.maybach7.formhandler.exception.ValidationException;
@@ -24,6 +26,8 @@ public class ApplicationServlet extends HttpServlet {
 
     private final CredentialsService credentialsService = CredentialsService.getInstance();
     private final SessionService sessionService = SessionService.getInstance();
+    private final SessionDao sessionDao = SessionDao.getInstance();
+    private final ApplicationService applicationService = ApplicationService.getInstance();
 
     private static final List<String> singleFields = Arrays.asList(
             "fullname",
@@ -43,7 +47,7 @@ public class ApplicationServlet extends HttpServlet {
         RequestDispatcher dispatcher = req.getRequestDispatcher("form.jsp");
 
         String sessionId = CookiesUtil.getCookie(req, "session_id").orElse(null);
-        if(sessionId != null) {
+        if (sessionId != null) {
 
             try {
                 User user = sessionService.getUserBySessionId(sessionId);
@@ -56,11 +60,11 @@ public class ApplicationServlet extends HttpServlet {
                 req.setAttribute("biography", user.getBiography());
                 var temp = user.getLanguages();
                 String[] temp2 = temp.stream()
-                                .map(ProgrammingLanguage::getName)
-                                        .toArray(String[]::new);
+                        .map(ProgrammingLanguage::getName)
+                        .toArray(String[]::new);
                 System.out.println(Arrays.toString(temp2));
                 System.out.println(String.join(",", temp2));
-                req.setAttribute("languages",  String.join(",", temp2));
+                req.setAttribute("languages", String.join(",", temp2));
 
             } catch (InvalidSessionException exc) {
                 CookiesUtil.clearCookies(req, resp);
@@ -95,8 +99,7 @@ public class ApplicationServlet extends HttpServlet {
                 CookiesUtil.getCookieArray(req, field).ifPresent(value -> req.setAttribute(field, String.join(",", value)));
             }
         }
-        // lhljlqzwxr
-        // v=)(H`F=u1
+
 
         dispatcher.forward(req, resp);
     }
@@ -105,6 +108,7 @@ public class ApplicationServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         resp.setContentType("text/html");
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
         var applicationDto = ApplicationDto.builder()
                 .fullName(req.getParameter("fullname"))
                 .email(req.getParameter("email"))
@@ -114,10 +118,41 @@ public class ApplicationServlet extends HttpServlet {
                 .programmingLanguages(Arrays.stream(req.getParameterValues("languages")).toList())
                 .biography(req.getParameter("biography"))
                 .build();
+
+        String sessionId = CookiesUtil.getCookie(req, "session_id").orElse(null);
+        boolean hasSessionId = sessionId != null;
+
         try {
-            System.out.println(applicationDto);
-            User user = ApplicationService.getInstance().createUser(applicationDto);
-            System.out.println(user);
+            if (hasSessionId) {
+                Session session = sessionDao.findBySessionId(sessionId);
+                if (session == null) {
+                    CookiesUtil.clearCookies(req, resp);
+                    resp.sendRedirect("/application");
+                    return;
+                } else {
+                    applicationService.updateUser(applicationDto, session.getUserId());
+                }
+            } else {
+                System.out.println(applicationDto);
+                User user = applicationService.createUser(applicationDto);
+                System.out.println(user);
+
+                String login = AuthService.createLogin();
+                String password = AuthService.createPassword();
+                byte[] salt = HashingService.getSalt();
+                byte[] hashedPassword = HashingService.getHash(password, salt);
+                Credentials credentials = Credentials.builder()
+                        .userId(user.getId())
+                        .login(login)
+                        .password(HashingService.toString(hashedPassword))
+                        .salt(HashingService.toString(salt))
+                        .build();
+
+                credentialsService.createCredentials(credentials);
+
+                req.getSession().setAttribute("login", login);
+                req.getSession().setAttribute("password", password);
+            }
 
             // Установка Cookies для автозаполнения формы
             int year = 60 * 60 * 24 * 365;
@@ -129,21 +164,6 @@ public class ApplicationServlet extends HttpServlet {
                 String[] values = req.getParameterValues(field);
                 CookiesUtil.setCookieArray(resp, field, values, year);
             }
-            String login = AuthService.createLogin();
-            String password = AuthService.createPassword();
-            byte[] salt = HashingService.getSalt();
-            byte[] hashedPassword = HashingService.getHash(password, salt);
-            Credentials credentials = Credentials.builder()
-                            .userId(user.getId())
-                            .login(login)
-                            .password(HashingService.toString(hashedPassword))
-                            .salt(HashingService.toString(salt))
-                            .build();
-
-            credentialsService.createCredentials(credentials);
-
-            req.getSession().setAttribute("login", login);
-            req.getSession().setAttribute("password", password);
             resp.sendRedirect(req.getContextPath() + "/application");
         } catch (ValidationException exc) {      // здесь необходимо передать список ошибок в JSP и обработать там
 

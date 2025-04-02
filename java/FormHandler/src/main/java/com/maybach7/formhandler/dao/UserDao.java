@@ -29,6 +29,9 @@ public class UserDao {
     private final static String SAVE_LANGUAGE_SQL =
             "INSERT INTO users_languages(user_id, language_id) VALUES(?, ?)";
 
+    private final static String DELETE_LANGUAGE_SQL =
+            "DELETE FROM users_languages WHERE user_id = ?";
+
     private final static String FIND_BY_ID_SQL = """
             SELECT u.id, u.fullname, u.email, u.phone, u.birthday, u.gender, u.biography,
                 l.name as language_name
@@ -38,9 +41,15 @@ public class UserDao {
             WHERE u.id = ? ;
             """;
 
+    private final static String UPDATE_SQL = """
+            UPDATE users u 
+            set fullname = ?, email = ?, phone = ?, birthday = ?, gender = ?, biography = ?
+            WHERE u.id = ? ;
+            """;
+
     public Optional<User> findById(int id) {
-        try(var connection = ConnectionManager.get();
-            var preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
+        try (var connection = ConnectionManager.get();
+             var preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             preparedStatement.setInt(1, id);
 
             var resultSet = preparedStatement.executeQuery();
@@ -48,8 +57,8 @@ public class UserDao {
             User user = null;
             List<ProgrammingLanguage> languages = new ArrayList<>();
 
-            while(resultSet.next()) {
-                if(user == null) {
+            while (resultSet.next()) {
+                if (user == null) {
                     user = User.builder()
                             .id(resultSet.getInt("id"))
                             .fullName(resultSet.getString("fullname"))
@@ -62,7 +71,7 @@ public class UserDao {
                             .build();
                 }
                 String languageName = resultSet.getString("language_name");
-                if(languageName != null) {
+                if (languageName != null) {
                     ProgrammingLanguage.find(languageName).ifPresent(languages::add);
                 }
             }
@@ -97,6 +106,25 @@ public class UserDao {
         }
     }
 
+    public User update(User user) {
+        try (var connection = ConnectionManager.get();
+             var preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
+            preparedStatement.setString(1, user.getFullName());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setString(3, user.getPhone());
+            preparedStatement.setObject(4, user.getBirthday());
+            preparedStatement.setString(5, user.getGender().toString());
+            preparedStatement.setString(6, user.getBiography());
+            preparedStatement.setInt(7, user.getId());
+
+            int updatedRows = preparedStatement.executeUpdate();
+            System.out.println("Statement has updated: " + updatedRows + " rows");
+            return user;
+        } catch (SQLException exc) {
+            throw new DaoException(exc);
+        }
+    }
+
     public boolean saveLanguage(User user, Language language) {
         try (var connection = ConnectionManager.get();
              var preparedStatement = connection.prepareStatement(SAVE_LANGUAGE_SQL)) {
@@ -106,6 +134,20 @@ public class UserDao {
             int insertedRows = preparedStatement.executeUpdate();
             System.out.println("Statement has inserted: " + insertedRows + " rows");
             return true;
+        } catch (SQLException exc) {
+            throw new DaoException(exc);
+        }
+    }
+
+    public boolean deleteLanguages(User user) {
+        try (var connection = ConnectionManager.get();
+             var preparedStatement = connection.prepareStatement(DELETE_LANGUAGE_SQL)) {
+            preparedStatement.setInt(1, user.getId());
+
+            int deletedRows = preparedStatement.executeUpdate();
+            System.out.println("Statement has deleted: " + deletedRows + " rows");
+
+            return deletedRows > 0;
         } catch (SQLException exc) {
             throw new DaoException(exc);
         }

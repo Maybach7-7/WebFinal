@@ -1,13 +1,16 @@
 package com.maybach7.formhandler.service;
 
 import com.maybach7.formhandler.dao.LanguageDao;
+import com.maybach7.formhandler.dao.SessionDao;
 import com.maybach7.formhandler.dao.UserDao;
 import com.maybach7.formhandler.dto.ApplicationDto;
 import com.maybach7.formhandler.entity.Language;
 import com.maybach7.formhandler.entity.User;
+import com.maybach7.formhandler.exception.InvalidSessionException;
 import com.maybach7.formhandler.exception.ValidationException;
 import com.maybach7.formhandler.mapper.UserMapper;
 import com.maybach7.formhandler.validator.ApplicationValidator;
+import com.maybach7.formhandler.validator.ValidationResult;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +21,7 @@ public class ApplicationService {
     private final ApplicationValidator applicationValidator = ApplicationValidator.getInstance();
     private final UserMapper userMapper = UserMapper.getInstance();
     private final UserDao userDao = UserDao.getInstance();
+    private final SessionDao sessionDao = SessionDao.getInstance();
 
     public User createUser(ApplicationDto dto) throws ValidationException {
         var validationResult = applicationValidator.validate(dto);
@@ -33,6 +37,24 @@ public class ApplicationService {
         for (var lang : user.getLanguages()) {
             Language language = LanguageDao.getInstance().findByName(lang.getName());
             System.out.println("Language has found by name: " + language);
+            UserDao.getInstance().saveLanguage(user, language);
+        }
+
+        return user;
+    }
+
+    public User updateUser(ApplicationDto dto, int userId) throws ValidationException{
+        var validationResult = applicationValidator.validate(dto);
+        if (!validationResult.isValid()) {
+            throw new ValidationException(validationResult.getErrors());
+        }
+        User user = userMapper.mapFrom(dto);
+        user.setId(userId);
+        user = userDao.update(user);
+        userDao.deleteLanguages(user);
+
+        for (var lang : user.getLanguages()) {
+            Language language = LanguageDao.getInstance().findByName(lang.getName());
             UserDao.getInstance().saveLanguage(user, language);
         }
 

@@ -12,12 +12,8 @@ import com.maybach7.formhandler.util.CookiesUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -46,33 +42,40 @@ public class ApplicationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         RequestDispatcher dispatcher = req.getRequestDispatcher("form.jsp");
 
-        HttpSession session = req.getSession();
-        if (session.getAttribute("errors") != null) {
-            req.setAttribute("errors", session.getAttribute("errors"));
-            session.removeAttribute("errors");
-        }
-        if (session.getAttribute("login") != null && session.getAttribute("password") != null) {
-            System.out.println("Login in session: " + session.getAttribute("login"));
-            req.setAttribute("login", session.getAttribute("login"));
-            session.removeAttribute("login");
+        String sessionId = CookiesUtil.getCookie(req, "session_id").orElse(null);
+        if(sessionId != null) {
 
-            req.setAttribute("password", session.getAttribute("password"));
-            session.removeAttribute("password");
-        }
-        session.invalidate();   // дальше пусть пользователь регается
+        } else {
+            HttpSession session = req.getSession();
+            if (session.getAttribute("errors") != null) {
+                req.setAttribute("errors", session.getAttribute("errors"));
+                session.removeAttribute("errors");
+            }
+            if (session.getAttribute("login") != null && session.getAttribute("password") != null) {
+                System.out.println("Login in session: " + session.getAttribute("login"));
+                req.setAttribute("login", session.getAttribute("login"));
+                session.removeAttribute("login");
 
-        // Мы перенаправляем сюда POST-запрос, предварительно записав в ответ необходимые Cookies
-        // Здесь мы читаем эти Cookies из запроса, устанавливаем в запросе аттрибуты для каждого поля,
-        // имея в них имя Cookie, и его значение.
-        // Затем этот запрос направляется в form.jsp с помощью RequestDispatcher, откуда оно будет передано
-        // обратно изначальному клиенту
-        for (var field : singleFields) {
-            CookiesUtil.getCookie(req, field).ifPresent(value -> req.setAttribute(field, value));
-        }
+                req.setAttribute("password", session.getAttribute("password"));
+                session.removeAttribute("password");
+            }
+            session.invalidate();   // дальше пусть пользователь регается
 
-        for (var field : multipleFields) {
-            CookiesUtil.getCookieArray(req, field).ifPresent(value -> req.setAttribute(field, String.join(",", value)));
+            // Мы перенаправляем сюда POST-запрос, предварительно записав в ответ необходимые Cookies
+            // Здесь мы читаем эти Cookies из запроса, устанавливаем в запросе аттрибуты для каждого поля,
+            // имея в них имя Cookie, и его значение.
+            // Затем этот запрос направляется в form.jsp с помощью RequestDispatcher, откуда оно будет передано
+            // обратно изначальному клиенту
+            for (var field : singleFields) {
+                CookiesUtil.getCookie(req, field).ifPresent(value -> req.setAttribute(field, value));
+            }
+
+            for (var field : multipleFields) {
+                CookiesUtil.getCookieArray(req, field).ifPresent(value -> req.setAttribute(field, String.join(",", value)));
+            }
         }
+        // qbjiuonfly
+        // 24*nE|E,Jg
 
         dispatcher.forward(req, resp);
     }

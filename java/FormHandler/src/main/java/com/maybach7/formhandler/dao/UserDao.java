@@ -15,7 +15,7 @@ public class UserDao {
 
     private final static UserDao INSTANCE = new UserDao();
 
-    private final static String SAVE_SQL =
+    private final static String SAVE_USER_SQL =
             "INSERT INTO users(fullname, email, phone, birthday, gender, biography)" +
             "VALUES(?, ?, ?, ?, ?, ?)";
 
@@ -24,7 +24,7 @@ public class UserDao {
 
     public User save(User user) {
         try (var connection = ConnectionManager.get();
-             var preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
+             var preparedStatement = connection.prepareStatement(SAVE_USER_SQL, Statement.RETURN_GENERATED_KEYS)) {
             System.out.println("Connected to a database");
             preparedStatement.setString(1, user.getFullName());
             preparedStatement.setString(2, user.getEmail());

@@ -13,10 +13,11 @@ import java.util.Optional;
 
 public class CookiesUtil {
 
-    public static void setSessionCookie(HttpServletResponse resp, Session session) {
+
+    public static void setSessionCookie(HttpServletResponse resp, Session session, int maxAge) {
         if(session != null) {
             Cookie sessionId = new Cookie("session_id", session.getSessionId());
-            sessionId.setMaxAge(60*60*24*7);
+            sessionId.setMaxAge(maxAge);
             sessionId.setPath("/");
             resp.addCookie(sessionId);
         } else {
@@ -25,6 +26,11 @@ public class CookiesUtil {
             sessionId.setPath("/");
             resp.addCookie(sessionId);
         }
+    }
+
+    public static void setSessionCookie(HttpServletResponse resp, Session session) {
+        int weekDuration = 60 * 60 * 24 * 7;
+        setSessionCookie(resp, session, weekDuration);
     }
 
     public static void setCookie(HttpServletResponse resp, String name, String value, int maxAge) { // сохраняет одинарное значение cookie
@@ -106,5 +112,17 @@ public class CookiesUtil {
             }
         }
         return Optional.empty();
+    }
+
+    public static void clearCookies(HttpServletRequest req, HttpServletResponse resp) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                cookie.setValue("");
+                cookie.setMaxAge(0);
+                cookie.setPath("/");
+                resp.addCookie(cookie);
+            }
+        }
     }
 }

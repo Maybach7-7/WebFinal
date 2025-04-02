@@ -1,6 +1,7 @@
 <%@ page import="java.util.Arrays" %>
 <%@ page import="com.maybach7.formhandler.validator.InputError" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.maybach7.formhandler.util.CookiesUtil" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +14,17 @@
 <body>
 
 <header class="header">
-    <a href="/login"><button class="login-button">Войти</button></a>
+    <%
+        if(CookiesUtil.getCookie(request, "session_id").isPresent()) {
+     %>
+            <button class="login-button">Выйти</button>
+    <%
+        } else {
+    %>
+            <a href="/login"><button class="login-button">Войти</button></a>
+    <%
+        }
+    %>
 </header>
 
 <div class="popup-content">
@@ -28,8 +39,7 @@
                     hasErrors = true;
                     for (var error : errors) {
             %>
-            <p style="color:red; padding: 10px"><%=error.getMessage()%>
-            </p>
+            <p style="color:red; padding: 10px"><%=error.getMessage()%></p>
             <%
                     }
                 }

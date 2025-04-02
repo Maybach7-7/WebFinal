@@ -19,7 +19,7 @@ public class SessionServlet extends HttpServlet {
     private final static LoginService loginService = LoginService.getInstance();
 
     // POST запрос исспользуется при авторизации
-    // и выдаёт SESSIONID
+    // и выдаёт session_id
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         var credentialsDto = LoginDto.builder()
@@ -30,6 +30,7 @@ public class SessionServlet extends HttpServlet {
         try {
             var session = loginService.login(credentialsDto);
             CookiesUtil.setSessionCookie(resp, session);
+            CookiesUtil.clearCookies(req, resp);
 
             resp.sendRedirect(req.getContextPath() + "/application");
         } catch (ValidationException exc) {

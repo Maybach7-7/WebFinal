@@ -12,6 +12,6 @@ public class LoginException extends Exception {
     private List<InputError> errors = new ArrayList<>();
 
     public LoginException() {
-        errors.add(InputError.of("LoginOrPassword", "Логин или пароль введены неверно!"));
+        errors.add(InputError.of("invalid_credentials", "Логин или пароль введены неверно!"));
     }
 }

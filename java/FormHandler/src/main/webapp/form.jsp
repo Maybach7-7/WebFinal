@@ -138,7 +138,7 @@
     <%}%>
 
     <% if (request.getAttribute("password") != null) {%>
-    <p>Ваш логин: ${password}</p>
+    <p>Ваш пароль: ${password}</p>
     <%}%>
 </div>
 </body>

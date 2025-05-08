@@ -15,10 +15,11 @@
 <body>
 
 <header class="header">
+    <a href="/admin"><button class="navbar-button">Я админ</button></a>
     <%
         if(CookiesUtil.getCookie(request, "session_id").isPresent()) {
      %>
-            <button class="login-button">Выйти</button>
+            <button class="navbar-button">Выйти</button>
     <%
         } else {
     %>

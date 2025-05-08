@@ -21,6 +21,14 @@ public class UserDao {
 
     private final static UserDao INSTANCE = new UserDao();
 
+    private final static String FIND_ALL_SQL = """
+            SELECT u.id, u.fullname, u.email, u.phone, u.birthday, u.gender, u.biography,
+            l.name as language_name
+            FROM users u
+            LEFT JOIN users_languages ul ON u.id = ul.user_id
+            LEFT JOIN languages l ON ul.language_id = l.id
+            """;
+
     private final static String SAVE_USER_SQL =
             "INSERT INTO users(fullname, email, phone, birthday, gender, biography)" +
             "VALUES(?, ?, ?, ?, ?, ?)";
@@ -45,6 +53,68 @@ public class UserDao {
             set fullname = ?, email = ?, phone = ?, birthday = ?, gender = ?, biography = ?
             WHERE u.id = ? ;
             """;
+
+    private final static String DELETE_SQL = """
+            DELETE FROM users
+            WHERE id = ?;
+            """;
+
+    public void deleteById(int id) {
+        try (var connection = ConnectionManager.get();
+             var preparedStatement = connection.prepareStatement(DELETE_SQL)) {
+            User user = new User();
+            user.setId(id);
+            deleteLanguages(user);
+
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException exc) {
+            throw new DaoException(exc);
+        }
+    }
+
+    public List<User> findAll() {
+        try (var connection = ConnectionManager.get();
+             var preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
+            var resultSet = preparedStatement.executeQuery();
+
+            User user = null;
+            List<User> users = new ArrayList<>();
+            System.out.println("Стартуем! User = " + user);
+
+            while (resultSet.next()) {
+                if (user == null || user.getId() != resultSet.getInt("id")) {   // стартуем нового юзера
+                    if (user != null && user.getId() != resultSet.getInt("id")) {
+                        System.out.println("Добавляем пользователя: " + user);
+                        users.add(user);    // новый юзер либо первый
+                        System.out.println(users);
+                    }
+                    user = User.builder()
+                            .id(resultSet.getInt("id"))
+                            .fullName(resultSet.getString("fullname"))
+                            .email(resultSet.getString("email"))
+                            .phone(resultSet.getString("phone"))
+                            .birthday(resultSet.getObject("birthday", LocalDate.class))
+                            .gender(Gender.valueOf(resultSet.getString("gender")))
+                            .biography(resultSet.getString("biography"))
+                            .languages(new ArrayList<>())
+                            .build();
+                    System.out.println("Присвоен user = " + user);
+                }
+
+                String languageName = resultSet.getString("language_name");
+                System.out.println("Найден language_name: " + languageName);
+                if (languageName != null) {     // если есть языки, то добавляем в список
+                    ProgrammingLanguage.find(languageName).ifPresent(user.getLanguages()::add);
+                }
+            }
+            System.out.println("Итоговый список users: " + users);
+            if (user != null) users.add(user);
+            return users;
+        } catch (SQLException exc) {
+            throw new DaoException(exc);
+        }
+    }
 
     public Optional<User> findById(int id) {
         try (var connection = ConnectionManager.get();

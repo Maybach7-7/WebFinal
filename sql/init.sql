@@ -42,12 +42,12 @@ CREATE TABLE users_languages(
 	user_id integer,
 	language_id integer,
 	primary key(user_id, language_id),
-	foreign key(user_id) references users(id),
+	foreign key(user_id) references users(id) ON DELETE CASCADE,
 	foreign key(language_id) references languages(id)
 );
 
 CREATE TABLE users_credentials(
-	user_id integer not null references users,
+	user_id integer not null references users ON DELETE CASCADE,
 	login text not null,
 	password text not null,
 	salt text not null

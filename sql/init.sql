@@ -54,10 +54,12 @@ CREATE TABLE users_credentials(
 );
 
 CREATE TABLE users_sessions(
-	session_id text primary key,
-	user_id integer not null references users,
+	session_id text,
+	user_id integer,
 	created_at timestamp not null default current_timestamp,
-	expires_at timestamp not null
+	expires_at timestamp not null,
+	primary key(session_id, user_id),
+	foreign key(user_id) references users(id) ON DELETE CASCADE
 );
 
 ALTER DATABASE web SET search_path = applications, public;

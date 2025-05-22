@@ -2,22 +2,18 @@ package com.maybach7.formhandler.servlet;
 
 import com.maybach7.formhandler.dao.UserDao;
 import com.maybach7.formhandler.dto.ApplicationDto;
-import com.maybach7.formhandler.entity.Gender;
-import com.maybach7.formhandler.entity.ProgrammingLanguage;
 import com.maybach7.formhandler.entity.User;
 import com.maybach7.formhandler.exception.ValidationException;
 import com.maybach7.formhandler.service.ApplicationService;
-import com.maybach7.formhandler.util.LocalDateFormatter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 @WebServlet("/admin/edit")
 public class EditApplicationServlet extends HttpServlet {
@@ -38,13 +34,13 @@ public class EditApplicationServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         var applicationDto = ApplicationDto.builder()
-                .fullName(req.getParameter("fullname"))
-                .email(req.getParameter("email"))
-                .phone(req.getParameter("phone"))
-                .birthday(req.getParameter("birthday"))
-                .gender(req.getParameter("gender"))
+                .fullName(StringEscapeUtils.escapeHtml4(req.getParameter("fullname")))
+                .email(StringEscapeUtils.escapeHtml4(req.getParameter("email")))
+                .phone(StringEscapeUtils.escapeHtml4(req.getParameter("phone")))
+                .birthday(StringEscapeUtils.escapeHtml4(req.getParameter("birthday")))
+                .gender(StringEscapeUtils.escapeHtml4(req.getParameter("gender")))
                 .programmingLanguages(Arrays.stream(req.getParameterValues("languages")).toList())
-                .biography(req.getParameter("biography"))
+                .biography(StringEscapeUtils.escapeHtml4(req.getParameter("biography")))
                 .build();
 
         int id = Integer.parseInt(req.getParameter("id"));

@@ -14,6 +14,7 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -110,13 +111,13 @@ public class ApplicationServlet extends HttpServlet {
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         var applicationDto = ApplicationDto.builder()
-                .fullName(req.getParameter("fullname"))
-                .email(req.getParameter("email"))
-                .phone(req.getParameter("phone"))
-                .birthday(req.getParameter("birthday"))
-                .gender(req.getParameter("gender"))
+                .fullName(StringEscapeUtils.escapeHtml4(req.getParameter("fullname")))
+                .email(StringEscapeUtils.escapeHtml4(req.getParameter("email")))
+                .phone(StringEscapeUtils.escapeHtml4(req.getParameter("phone")))
+                .birthday(StringEscapeUtils.escapeHtml4(req.getParameter("birthday")))
+                .gender(StringEscapeUtils.escapeHtml4(req.getParameter("gender")))
                 .programmingLanguages(Arrays.stream(req.getParameterValues("languages")).toList())
-                .biography(req.getParameter("biography"))
+                .biography(StringEscapeUtils.escapeHtml4(req.getParameter("biography")))
                 .build();
 
         String sessionId = CookiesUtil.getCookie(req, "session_id").orElse(null);

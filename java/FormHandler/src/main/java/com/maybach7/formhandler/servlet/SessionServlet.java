@@ -10,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
 
@@ -23,7 +24,7 @@ public class SessionServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         var credentialsDto = LoginDto.builder()
-                .login(req.getParameter("login"))
+                .login(StringEscapeUtils.escapeHtml4(req.getParameter("login")))
                 .password(req.getParameter("password"))
                 .build();
 

@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application</title>
-    <link rel="stylesheet" type="text/css" href="http://localhost/static/form/style.css">
+    <link rel="stylesheet" type="text/css" href="/static/form/style.css">
 </head>
 <body>
 

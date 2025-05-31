@@ -5,7 +5,6 @@
     <title>Error</title>
 </head>
 <body>
-    <h1>Произошла ошибка!</h1>
-    <h2>Повторите операцию позже</h2>
+    <h1>An error occured!</h1>
 </body>
 </html>

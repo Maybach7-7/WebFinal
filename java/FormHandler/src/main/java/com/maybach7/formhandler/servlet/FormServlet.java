@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@WebServlet("/form")
+@WebServlet("/form/*")
 public class FormServlet extends HttpServlet {
 
     private final CredentialsService credentialsService = CredentialsService.getInstance();
@@ -207,5 +207,35 @@ public class FormServlet extends HttpServlet {
             req.getSession().setAttribute("errors", exc.getErrors());
             resp.sendRedirect(req.getContextPath() + "/form");
         }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String sessionId = extractSessionIdFromPath(req);
+
+        Session session = sessionDao.findBySessionId(sessionId);
+        if (session == null) {      // Смотрим, если сессия невалидная
+            CookiesUtil.clearCookies(req, resp);
+            resp.sendRedirect("/form");
+        } else {
+            System.out.println("Происходит обработка PUT-запроса");
+            ApplicationDto applicationDto = objectMapper.readValue(req.getInputStream(), ApplicationDto.class);
+            // переводим JSON в DTO
+            try {
+                applicationService.updateUser(applicationDto, session.getUserId());
+            } catch (ValidationException e) {
+                e.printStackTrace();
+            }
+            resp.setContentType("application/json");
+            resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+        }
+    }
+
+    private String extractSessionIdFromPath(HttpServletRequest req) {
+        String pathInfo = req.getPathInfo(); // /abc-123
+        if (pathInfo != null && pathInfo.length() > 1) {
+            return pathInfo.substring(1); // abc-123
+        }
+        return null;
     }
 }

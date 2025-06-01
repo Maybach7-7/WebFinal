@@ -175,17 +175,19 @@
 
         <form id="real-form" action="/form" method="POST">
 
-            <% boolean hasErrors = false;
-                List<InputError> errors = (List<InputError>) request.getAttribute("errors");
-                if (errors != null) {
-                    hasErrors = true;
-                    for (var error : errors) {
-            %>
-            <p style="color:red; padding: 10px">
-                <%=error.getMessage()%>
-            </p>
-            <% }
-            } %>
+            <div id="form-errors">
+                <% boolean hasErrors = false;
+                    List<InputError> errors = (List<InputError>) request.getAttribute("errors");
+                    if (errors != null) {
+                        hasErrors = true;
+                        for (var error : errors) {
+                %>
+                <p style="color:red; padding: 10px">
+                    <%=error.getMessage()%>
+                </p>
+                <% }
+                } %>
+            </div>
 
             <label for="fullname">ФИО <span class="required">*</span></label>
             <input type="text" id="fullname" name="fullname" required

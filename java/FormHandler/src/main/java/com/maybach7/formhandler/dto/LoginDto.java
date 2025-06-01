@@ -1,12 +1,14 @@
 package com.maybach7.formhandler.dto;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
-@Value
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class LoginDto {
 
-    String login;
-    String password;
+    private String login;
+    private String password;
 }

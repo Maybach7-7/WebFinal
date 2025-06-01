@@ -1,5 +1,6 @@
 package com.maybach7.formhandler.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maybach7.formhandler.dao.SessionDao;
 import com.maybach7.formhandler.dto.ApplicationDto;
 import com.maybach7.formhandler.entity.Credentials;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 @WebServlet("/form")
@@ -29,6 +31,7 @@ public class FormServlet extends HttpServlet {
     private final SessionService sessionService = SessionService.getInstance();
     private final SessionDao sessionDao = SessionDao.getInstance();
     private final ApplicationService applicationService = ApplicationService.getInstance();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final List<String> singleFields = Arrays.asList(
             "fullname",
@@ -109,15 +112,21 @@ public class FormServlet extends HttpServlet {
         resp.setContentType("text/html");
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        var applicationDto = ApplicationDto.builder()
-                .fullName(StringEscapeUtils.escapeHtml4(req.getParameter("fullname")))
-                .email(StringEscapeUtils.escapeHtml4(req.getParameter("email")))
-                .phone(StringEscapeUtils.escapeHtml4(req.getParameter("phone")))
-                .birthday(StringEscapeUtils.escapeHtml4(req.getParameter("birthday")))
-                .gender(StringEscapeUtils.escapeHtml4(req.getParameter("gender")))
-                .programmingLanguages(Arrays.stream(req.getParameterValues("languages")).toList())
-                .biography(StringEscapeUtils.escapeHtml4(req.getParameter("biography")))
-                .build();
+        boolean isJsonRequest = req.getContentType().contains("application/json");
+        ApplicationDto applicationDto = null;
+        if (isJsonRequest) {
+            applicationDto = objectMapper.readValue(req.getInputStream(), ApplicationDto.class);
+        } else {
+            applicationDto = ApplicationDto.builder()
+                    .fullName(StringEscapeUtils.escapeHtml4(req.getParameter("fullname")))
+                    .email(StringEscapeUtils.escapeHtml4(req.getParameter("email")))
+                    .phone(StringEscapeUtils.escapeHtml4(req.getParameter("phone")))
+                    .birthday(StringEscapeUtils.escapeHtml4(req.getParameter("birthday")))
+                    .gender(StringEscapeUtils.escapeHtml4(req.getParameter("gender")))
+                    .programmingLanguages(Arrays.stream(req.getParameterValues("languages")).toList())
+                    .biography(StringEscapeUtils.escapeHtml4(req.getParameter("biography")))
+                    .build();
+        }
 
         String sessionId = CookiesUtil.getCookie(req, "session_id").orElse(null);
         boolean hasSessionId = sessionId != null;
@@ -131,6 +140,11 @@ public class FormServlet extends HttpServlet {
                     return;
                 } else {
                     applicationService.updateUser(applicationDto, session.getUserId());
+                    if(isJsonRequest) {
+                        resp.setContentType("application/json");
+                        resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        return;
+                    }
                 }
             } else {
                 System.out.println(applicationDto);
@@ -140,6 +154,7 @@ public class FormServlet extends HttpServlet {
 
                 String login = AuthService.createLogin();
                 String password = AuthService.createPassword();
+                // сохраняем логин и пароль в БД
                 byte[] salt = HashingService.getSalt();
                 byte[] hashedPassword = HashingService.getHash(password, salt);
                 Credentials credentials = Credentials.builder()
@@ -151,8 +166,20 @@ public class FormServlet extends HttpServlet {
 
                 credentialsService.createCredentials(credentials);
 
-                req.getSession().setAttribute("login", login);
-                req.getSession().setAttribute("password", password);
+                if(isJsonRequest) {
+                    resp.setContentType("application/json");
+                    resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    var responseJson = Map.of(
+                            "login", login,
+                            "password", password
+                    );
+                    objectMapper.writeValue(resp.getWriter(), responseJson);
+                    return;
+                } else {
+                    req.getSession().setAttribute("login", login);
+                    req.getSession().setAttribute("password", password);
+                }
             }
 
             // Установка Cookies для автозаполнения формы

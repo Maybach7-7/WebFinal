@@ -23,7 +23,7 @@ import java.util.List;
 
 
 @WebServlet("/form")
-public class ApplicationServlet extends HttpServlet {
+public class FormServlet extends HttpServlet {
 
     private final CredentialsService credentialsService = CredentialsService.getInstance();
     private final SessionService sessionService = SessionService.getInstance();

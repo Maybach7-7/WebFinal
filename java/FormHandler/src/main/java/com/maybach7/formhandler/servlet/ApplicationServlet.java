@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@WebServlet("/application")
+@WebServlet("/form")
 public class ApplicationServlet extends HttpServlet {
 
     private final CredentialsService credentialsService = CredentialsService.getInstance();
@@ -101,7 +101,6 @@ public class ApplicationServlet extends HttpServlet {
             }
         }
 
-
         dispatcher.forward(req, resp);
     }
 
@@ -128,13 +127,14 @@ public class ApplicationServlet extends HttpServlet {
                 Session session = sessionDao.findBySessionId(sessionId);
                 if (session == null) {
                     CookiesUtil.clearCookies(req, resp);
-                    resp.sendRedirect("/application");
+                    resp.sendRedirect("/form");
                     return;
                 } else {
                     applicationService.updateUser(applicationDto, session.getUserId());
                 }
             } else {
                 System.out.println(applicationDto);
+                System.out.println("Собираемся делать валидацию перед сохранением в бд");
                 User user = applicationService.createUser(applicationDto);
                 System.out.println(user);
 
@@ -165,9 +165,8 @@ public class ApplicationServlet extends HttpServlet {
                 String[] values = req.getParameterValues(field);
                 CookiesUtil.setCookieArray(resp, field, values, year);
             }
-            resp.sendRedirect(req.getContextPath() + "/application");
+            resp.sendRedirect(req.getContextPath() + "/form");
         } catch (ValidationException exc) {      // здесь необходимо передать список ошибок в JSP и обработать там
-
             for (var field : singleFields) {
                 String value = req.getParameter(field);
                 CookiesUtil.setCookie(resp, field, value);
@@ -179,7 +178,7 @@ public class ApplicationServlet extends HttpServlet {
 
             System.out.println("Произошла ошибка в валидации");
             req.getSession().setAttribute("errors", exc.getErrors());
-            resp.sendRedirect(req.getContextPath() + "/application");
+            resp.sendRedirect(req.getContextPath() + "/form");
         }
     }
 }

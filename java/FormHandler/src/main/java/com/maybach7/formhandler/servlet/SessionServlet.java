@@ -33,7 +33,7 @@ public class SessionServlet extends HttpServlet {
             CookiesUtil.setSessionCookie(resp, session);
             CookiesUtil.clearCookies(req, resp);
 
-            resp.sendRedirect(req.getContextPath() + "/application");
+            resp.sendRedirect(req.getContextPath() + "/form");
         } catch (ValidationException exc) {
             req.getSession().setAttribute("errors", exc.getErrors());
             resp.sendRedirect(req.getContextPath() + "/login");
